@@ -57,7 +57,9 @@ def get_preprocessor(
     column_transformer: ColumnTransformer, feature_selector: PCA | SelectKBest
 ) -> Pipeline:
     """
-    Creates Pipeline Object that first standardizes all numeric Variables and encodes categorical Variables as Dummy Variables and then reduces the Dimensionality of the Feature Space.
+    Creates Pipeline Object that first standardizes all numeric Variables and encodes
+    categorical Variables as Dummy Variables and then reduces the Dimensionality of the
+    Feature Space.
     """
 
     return Pipeline(
@@ -128,8 +130,6 @@ class ClassificationMetrics:
 class MetricsComparison:
     metrics: Sequence[ClassificationMetrics]
     labels: Sequence[str] | None = None
-    lower_bound: float | None = None
-    marker_size: int | None = None
 
     def __post_init__(self):
         if self.labels is not None and len(self.metrics) != len(self.labels):
@@ -163,7 +163,7 @@ class MetricsComparison:
             xlim=(lower_bound, None)
         )
 
-    def barplot(self) -> sns.FacetGrid:
+    def barplot(self, lower_bound: float | None = None) -> sns.FacetGrid:
         plot_df = self._setup_plot()
 
         g = sns.catplot(
@@ -176,10 +176,10 @@ class MetricsComparison:
             sharex=False,
         )
 
-        self._set_aesthetics(g, self.lower_bound)
+        self._set_aesthetics(g, lower_bound)
         return g
 
-    def stripplot(self) -> sns.FacetGrid:
+    def stripplot(self, marker_size: int = 15) -> sns.FacetGrid:
         plot_df = self._setup_plot()
 
         g = sns.catplot(
@@ -190,7 +190,7 @@ class MetricsComparison:
             col="metric",
             col_wrap=3,
             sharex=False,
-            s=self.marker_size,
+            s=marker_size,
         )
 
         self._set_aesthetics(g, lower_bound=None)

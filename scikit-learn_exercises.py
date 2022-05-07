@@ -133,15 +133,13 @@ sns.set_theme(style="whitegrid")
 metrics_comparison = MetricsComparison(
     [rf_metrics, gb_metrics, xgb_metrics, lgbm_metrics],
     ["Random Forest", "HistGradientBoosting", "XGBoost", "LightGBM"],
-    lower_bound=0.7,
-    marker_size=10,
 )
 metrics_comparison.to_df()
 
 #%%
-metrics_comparison.barplot()
+metrics_comparison.barplot(lower_bound=0.7)
 
 #%%
-metrics_comparison.stripplot()
+metrics_comparison.stripplot(marker_size=15)
 
 #%%
