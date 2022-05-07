@@ -3,54 +3,61 @@ import matplotlib.pyplot as plt
 import pandas as pd
 import seaborn as sns
 from lightgbm import LGBMClassifier
-from sklearn.compose import ColumnTransformer, make_column_selector
 from sklearn.ensemble import HistGradientBoostingClassifier, RandomForestClassifier
 from sklearn.experimental import enable_halving_search_cv
 from sklearn.metrics import ConfusionMatrixDisplay, confusion_matrix
-from sklearn.model_selection import HalvingRandomSearchCV, train_test_split
-from sklearn.pipeline import Pipeline
-from sklearn.preprocessing import OneHotEncoder, StandardScaler
+from sklearn.model_selection import train_test_split
 from xgboost import XGBClassifier
 
-from sklearn_helpers import ClassificationMetrics, MetricsComparison
+from sklearn_helpers import (
+    ClassificationMetrics,
+    MetricsComparison,
+    get_column_transformer,
+    get_feature_selector,
+    get_preprocessor,
+    setup_cv,
+)
 
 #%%
 # SUBSECTION: Configuration Parameters
 DATA_PATH = "https://raw.githubusercontent.com/mrdbourke/zero-to-mastery-ml/master/data/heart-disease.csv"
 TARGET_COL = "target"
+SEED = 42
 
 #%%
-
 # SUBSECTION: Setup Data
 data = pd.read_csv(DATA_PATH)
+
+# NOTE: For large number of missing values or small data set use Imputation Strategy
+# https://scikit-learn.org/stable/modules/impute.html
+all_rows = len(data)
+data = data.dropna()
+non_missing_rows = len(data)
+print(f"Dropped {all_rows - non_missing_rows} rows with missing values.")
 data.head()
 
 #%%
 X = data.drop(columns=[TARGET_COL])
 y = data[TARGET_COL]
 
-X_train, X_test, y_train, y_test = train_test_split(X, y)
+X_train, X_test, y_train, y_test = train_test_split(X, y, random_state=SEED)
 X_train.shape, X_test.shape
 
 #%%
 # SUBSECTION: Preprocessing
-scaler = StandardScaler()
-encoder = OneHotEncoder(handle_unknown="ignore")
-
-column_transformer = ColumnTransformer(
-    [
-        ("scaler", scaler, make_column_selector(dtype_include="number")),
-        ("encoder", encoder, make_column_selector(dtype_include="object")),
-    ],
+column_transformer = get_column_transformer()
+feature_selector = get_feature_selector(
+    feature_selector="pca", pca_components=min(20, X_train.shape[1])
 )
+preprocessor = get_preprocessor(column_transformer, feature_selector)
+
 
 #%%
 # SUBSECTION: Modeling
 # BOOKMARK: Random Forest
-random_forest = RandomForestClassifier()
-pipe_rf = Pipeline([("preprocessor", column_transformer), ("clf", random_forest)])
-param_grid_rf = {"clf__n_estimators": range(10, 110, 10)}
-cv_rf = HalvingRandomSearchCV(pipe_rf, param_distributions=param_grid_rf)
+random_forest = RandomForestClassifier(random_state=SEED)
+param_grid_rf = {"model__n_estimators": range(10, 110, 10)}
+cv_rf = setup_cv(preprocessor, random_forest, param_grid_rf, random_state=SEED)
 cv_rf.fit(X_train, y_train)
 
 #%%
@@ -67,26 +74,23 @@ pd.DataFrame(cv_rf.cv_results_)
 
 #%%
 # BOOKMARK: HistGradientBoosting
-gradient_boosting = HistGradientBoostingClassifier()
-pipe_gb = Pipeline([("preprocessor", column_transformer), ("clf", gradient_boosting)])
-param_grid_gb = {"clf__max_depth": range(1, 6)}
-cv_gb = HalvingRandomSearchCV(pipe_gb, param_distributions=param_grid_gb)
+gradient_boosting = HistGradientBoostingClassifier(random_state=SEED)
+param_grid_gb = {"model__max_depth": range(1, 6)}
+cv_gb = setup_cv(preprocessor, gradient_boosting, param_grid_gb, random_state=SEED)
 cv_gb.fit(X_train, y_train)
 
 #%%
 # BOOKMARK: XGBoost
-xgboost = XGBClassifier()
-pipe_xgb = Pipeline([("preprocessor", column_transformer), ("clf", xgboost)])
-param_grid_xgb = {"clf__max_depth": range(1, 6)}
-cv_xgb = HalvingRandomSearchCV(pipe_xgb, param_distributions=param_grid_xgb)
+xgboost = XGBClassifier(random_state=SEED)
+param_grid_xgb = {"model__max_depth": range(1, 6)}
+cv_xgb = setup_cv(preprocessor, xgboost, param_grid_gb, random_state=SEED)
 cv_xgb.fit(X_train, y_train)
 
 #%%
 # BOOKMARK: LightGBM
-lightgbm = LGBMClassifier()
-pipe_lgbm = Pipeline([("preprocessor", column_transformer), ("clf", lightgbm)])
-param_grid_lgbm = {"clf__max_depth": range(1, 6)}
-cv_lgbm = HalvingRandomSearchCV(pipe_lgbm, param_distributions=param_grid_lgbm)
+lightgbm = LGBMClassifier(random_state=SEED)
+param_grid_lgbm = {"model__max_depth": range(1, 6)}
+cv_lgbm = setup_cv(preprocessor, lightgbm, param_grid_lgbm, random_state=SEED)
 cv_lgbm.fit(X_train, y_train)
 
 #%%
@@ -96,7 +100,7 @@ cv_lgbm.fit(X_train, y_train)
 # 2. accuracy_score(y_test, y_pred) with y_pred = cv.best_estimator_.predict(X_test)
 for cv in [cv_rf, cv_gb, cv_xgb, cv_lgbm]:
     print(
-        f"Accuracy {cv.best_estimator_['clf'].__class__.__name__}: {cv.score(X_test, y_test):.2f}"
+        f"Accuracy {cv.best_estimator_['model'].__class__.__name__}: {cv.score(X_test, y_test):.2f}"
     )
 
 #%%
