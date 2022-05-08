@@ -11,10 +11,12 @@ conda env create -f environment.yml
 
 Apart from `scikit-learn` itself, I will make use of the related packages `numpy` and `pandas` for data manipulation, `matplotlib` and `seaborn` for visualization as well as `xgboost` and `lightgbm` for additional modeling based on Gradient Boosting.
 
-Apart from [Stackoverflow](https://stackoverflow.com/) rabbit holes and various blog posts this project is mainly build upon the two excellent textbooks
+Apart from [Stackoverflow](https://stackoverflow.com/questions/tagged/scikit-learn) rabbit holes and various blog posts this project is mainly build upon the two excellent textbooks (with accompanying video lectures)
 
 - Sebastian Raschka et al.: Machine Learning with PyTorch and Scikit-Learn (2022)
+    - [Youtube Lectures from 2020](https://www.youtube.com/playlist?list=PLTKMiZHVd_2KyGirGEvKlniaWeLOHhUF3)
 - Andreas Müller, Sarah Guido: Introduction to Machine Learning with Python (2016)
+    - [Youtube Lectures from 2020](https://www.youtube.com/playlist?list=PL_pVmAaAnxIRnSw6wiCpSvshFyCREZmlM)
 
 and the fantastic [Scikit Learn Documentation](https://scikit-learn.org/stable/).
 
