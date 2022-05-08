@@ -16,7 +16,7 @@ class ParamGrid:
 
     param_grid: dict[str, Sequence] = field(default_factory=dict, init=False)
 
-    def add_hyperparams(self, **kwargs) -> None:
+    def add_hyperparams(self, **kwargs: Sequence) -> None:
         for key, value in kwargs.items():
             pipeline_key = "model__" + key
             self.param_grid[pipeline_key] = value
@@ -28,8 +28,8 @@ def cv_random(
     param_grid: ParamGrid | None = None,
     n_folds: int = 10,
     random_state: int = 42,
-    **hyperparams
-):
+    **hyperparams: Sequence
+) -> HalvingRandomSearchCV:
     """
     Construct Randomized Cross Validation object from `Pipeline` components.
     Hyperparameters of the model can be added either by passing an existing `ParamGrid`
