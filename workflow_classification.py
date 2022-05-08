@@ -3,8 +3,6 @@ import pandas as pd
 import seaborn as sns
 from lightgbm import LGBMClassifier
 from sklearn.ensemble import HistGradientBoostingClassifier, RandomForestClassifier
-from sklearn.experimental import enable_halving_search_cv
-from sklearn.metrics import ConfusionMatrixDisplay, confusion_matrix
 from sklearn.model_selection import train_test_split
 from xgboost import XGBClassifier
 
