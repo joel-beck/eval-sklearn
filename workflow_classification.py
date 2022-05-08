@@ -1,5 +1,4 @@
 #%%
-import matplotlib.pyplot as plt
 import pandas as pd
 import seaborn as sns
 from lightgbm import LGBMClassifier
@@ -9,13 +8,12 @@ from sklearn.metrics import ConfusionMatrixDisplay, confusion_matrix
 from sklearn.model_selection import train_test_split
 from xgboost import XGBClassifier
 
-from sklearn_helpers import (
-    ClassificationMetrics,
-    MetricsComparison,
+from helpers_evaluation import ClassificationMetrics, MetricsComparison
+from helpers_modeling import setup_cv
+from helpers_preprocessing import (
     get_column_transformer,
     get_feature_selector,
     get_preprocessor,
-    setup_cv,
 )
 
 #%%
@@ -122,17 +120,14 @@ lgbm_metrics
 
 #%%
 sns.set_theme(style="white")
-print(confusion_matrix(y_test, y_pred_rf))
-
-ConfusionMatrixDisplay.from_predictions(y_test, y_pred_rf)
-plt.show()
-
+print(rf_metrics.confusion_matrix)
+rf_metrics.plot_confusion_matrix()
 sns.set_theme(style="whitegrid")
 
 #%%
 metrics_comparison = MetricsComparison(
-    [rf_metrics, gb_metrics, xgb_metrics, lgbm_metrics],
-    ["Random Forest", "HistGradientBoosting", "XGBoost", "LightGBM"],
+    metrics=[rf_metrics, gb_metrics, xgb_metrics, lgbm_metrics],
+    labels=["Random Forest", "HistGradientBoosting", "XGBoost", "LightGBM"],
 )
 metrics_comparison.to_df()
 

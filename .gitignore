@@ -1,2 +1,5 @@
 .pytest_cache
 .vscode
+__pycache__/helpers_evaluation.cpython-310.pyc
+__pycache__/helpers_modeling.cpython-310.pyc
+__pycache__/helpers_preprocessing.cpython-310.pyc
