@@ -22,7 +22,7 @@ class ParamGrid:
             self.param_grid[pipeline_key] = value
 
 
-def cv_random(
+def cv_tuning(
     preprocessor: Pipeline,
     model: Any,
     param_grid: ParamGrid | None = None,
@@ -46,3 +46,8 @@ def cv_random(
         cv=n_folds,
         random_state=random_state,
     )
+
+
+# TODO: Implement cv_simple() cross validation without hyperparameter tuning with cross_val_score() or cross_validate()
+def cv_simple():
+    pass

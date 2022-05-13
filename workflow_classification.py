@@ -1,4 +1,7 @@
 #%%
+from configparser import ConfigParser, ExtendedInterpolation
+from pathlib import Path
+
 import pandas as pd
 import seaborn as sns
 from lightgbm import LGBMClassifier
@@ -6,8 +9,12 @@ from sklearn.ensemble import HistGradientBoostingClassifier, RandomForestClassif
 from sklearn.model_selection import train_test_split
 from xgboost import XGBClassifier
 
-from helpers_evaluation import ClassificationMetrics, MetricsComparison
-from helpers_modeling import cv_random
+from helpers_evaluation import (
+    ClassificationMetrics,
+    MetricsComparison,
+    RegressionMetrics,
+)
+from helpers_modeling import cv_tuning
 from helpers_preprocessing import (
     get_column_transformer,
     get_feature_selector,
@@ -16,13 +23,19 @@ from helpers_preprocessing import (
 
 #%%
 # SECTION: Configuration Parameters
-DATA_PATH = "https://raw.githubusercontent.com/mrdbourke/zero-to-mastery-ml/master/data/heart-disease.csv"
-TARGET_COL = "target"
-SEED = 42
+config = ConfigParser(interpolation=ExtendedInterpolation())
+config.read("config.ini")
+
+data_dir = config.get("Paths", "data_dir")
+data_classification_path = Path(data_dir) / config.get(
+    "Paths", "filename_classification"
+)
+seed = config.getint("Constants", "seed")
+target_col = config.get("Names", "target_col")
 
 #%%
 # SECTION: Setup Data
-data = pd.read_csv(DATA_PATH)
+data: pd.DataFrame = pd.read_pickle(data_classification_path)
 
 # NOTE: For large number of missing values or small data set use Imputation Strategy
 # https://scikit-learn.org/stable/modules/impute.html
@@ -33,10 +46,10 @@ print(f"Dropped {all_rows - non_missing_rows} rows with missing values.")
 data.head()
 
 #%%
-X = data.drop(columns=[TARGET_COL])
-y = data[TARGET_COL]
+X = data.drop(columns=[target_col])
+y = data[target_col]
 
-X_train, X_test, y_train, y_test = train_test_split(X, y, random_state=SEED)
+X_train, X_test, y_train, y_test = train_test_split(X, y, random_state=seed)
 X_train.shape, X_test.shape
 
 #%%
@@ -51,9 +64,9 @@ preprocessor = get_preprocessor(column_transformer, feature_selector)
 #%%
 # SECTION: Modeling
 # SUBSECTION: Random Forest
-random_forest = RandomForestClassifier(random_state=SEED)
-cv_rf = cv_random(
-    preprocessor, random_forest, random_state=SEED, n_estimators=range(10, 110, 10)
+random_forest = RandomForestClassifier(random_state=seed)
+cv_rf = cv_tuning(
+    preprocessor, random_forest, random_state=seed, n_estimators=range(10, 110, 10)
 )
 cv_rf.fit(X_train, y_train)
 
@@ -71,22 +84,22 @@ pd.DataFrame(cv_rf.cv_results_)
 
 #%%
 # SUBSECTION: HistGradientBoosting
-gradient_boosting = HistGradientBoostingClassifier(random_state=SEED)
-cv_gb = cv_random(
-    preprocessor, gradient_boosting, random_state=SEED, max_depth=range(1, 6)
+gradient_boosting = HistGradientBoostingClassifier(random_state=seed)
+cv_gb = cv_tuning(
+    preprocessor, gradient_boosting, random_state=seed, max_depth=range(1, 6)
 )
 cv_gb.fit(X_train, y_train)
 
 #%%
 # SUBSECTION: XGBoost
-xgboost = XGBClassifier(random_state=SEED)
-cv_xgb = cv_random(preprocessor, xgboost, random_state=SEED, max_depth=range(1, 6))
+xgboost = XGBClassifier(random_state=seed)
+cv_xgb = cv_tuning(preprocessor, xgboost, random_state=seed, max_depth=range(1, 6))
 cv_xgb.fit(X_train, y_train)
 
 #%%
 # SUBSECTION: LightGBM
-lightgbm = LGBMClassifier(random_state=SEED)
-cv_lgbm = cv_random(preprocessor, lightgbm, random_state=SEED, max_depth=range(1, 6))
+lightgbm = LGBMClassifier(random_state=seed)
+cv_lgbm = cv_tuning(preprocessor, lightgbm, random_state=seed, max_depth=range(1, 6))
 cv_lgbm.fit(X_train, y_train)
 
 #%%
@@ -102,7 +115,7 @@ for cv in [cv_rf, cv_gb, cv_xgb, cv_lgbm]:
 #%%
 # SUBSECTION: Overview of Metrics from individual models
 y_pred_rf = cv_rf.best_estimator_.predict(X_test)
-rf_metrics = ClassificationMetrics(y_test, y_pred_rf)
+rf_metrics = ClassificationMetrics(y_true=y_test, class_pred=y_pred_rf)
 rf_metrics
 
 y_pred_gb = cv_gb.best_estimator_.predict(X_test)
@@ -127,12 +140,12 @@ sns.set_theme(style="whitegrid")
 # SUBSECTION: Compare Metrics from multiple different Models
 metrics_comparison = MetricsComparison(
     metrics=[rf_metrics, gb_metrics, xgb_metrics, lgbm_metrics],
-    labels=["Random Forest", "HistGradientBoosting", "XGBoost", "LightGBM"],
+    model_names=["Random Forest", "HistGradientBoosting", "XGBoost", "LightGBM"],
 )
 metrics_comparison.to_df()
 
 #%%
-metrics_comparison.barplot(lower_bound=0.7)
+metrics_comparison.barplot(lower_bound=0.8)
 
 #%%
 metrics_comparison.stripplot(marker_size=15)

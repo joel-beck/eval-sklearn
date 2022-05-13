@@ -10,7 +10,11 @@ from sklearn.metrics import (
     accuracy_score,
     confusion_matrix,
     f1_score,
+    mean_absolute_error,
+    mean_absolute_percentage_error,
+    mean_squared_error,
     precision_score,
+    r2_score,
     recall_score,
     roc_auc_score,
 )
@@ -19,12 +23,34 @@ sns.set_theme(style="whitegrid")
 
 
 @dataclass
-class ClassificationMetrics:
+class BaseMetrics:
     y_true: np.ndarray
-    class_pred: np.ndarray
+    y_pred: np.ndarray | None = None
+    class_pred: np.ndarray | None = None
     prob_pred: np.ndarray | None = None
 
-    def __post_init__(self):
+    def _to_dict(self) -> None:
+        return NotImplementedError
+
+    def to_dict(self) -> dict[str, float]:
+        return self._to_dict()
+
+    def to_df(self) -> pd.Series:
+        return pd.Series(self.to_dict())
+
+    def __repr__(self) -> str:
+        return "\n".join(f"{key}: {value:.2f}" for key, value in self.to_dict().items())
+
+
+class ClassificationMetrics(BaseMetrics):
+    def __init__(
+        self,
+        y_true: np.ndarray,
+        class_pred: np.ndarray,
+        prob_pred: np.ndarray | None = None,
+    ):
+        super().__init__(y_true=y_true, class_pred=class_pred, prob_pred=prob_pred)
+
         self.accuracy = accuracy_score(self.y_true, self.class_pred)
         self.precision = precision_score(self.y_true, self.class_pred)
         self.recall = recall_score(self.y_true, self.class_pred)
@@ -36,28 +62,14 @@ class ClassificationMetrics:
             else roc_auc_score(self.y_true, self.class_pred)
         )
 
-    def __repr__(self) -> str:
-        return "\n".join(
-            [
-                f"Accuracy: {self.accuracy:.2f}",
-                f"Precision: {self.precision:.2f}",
-                f"Recall: {self.recall:.2f}",
-                f"F1 Score: {self.f1_score:.2f}",
-                f"AUC: {self.auc:.2f}",
-            ]
-        )
-
-    def to_dict(self) -> dict[str, float]:
-        return dict(
-            accuracy=self.accuracy,
-            precision=self.precision,
-            recall=self.recall,
-            f1_score=self.f1_score,
-            auc=self.auc,
-        )
-
-    def to_df(self) -> pd.Series:
-        return pd.Series(self.to_dict())
+    def _to_dict(self) -> dict[str, float]:
+        return {
+            "Accuracy": self.accuracy,
+            "Precision": self.precision,
+            "Recall": self.recall,
+            "F1 Score": self.f1_score,
+            "AUC": self.auc,
+        }
 
     @property
     def confusion_matrix(self):
@@ -68,18 +80,36 @@ class ClassificationMetrics:
         plt.show()
 
 
+class RegressionMetrics(BaseMetrics):
+    def __init__(self, y_true: np.ndarray, y_pred: np.ndarray):
+        super().__init__(y_true=y_true, y_pred=y_pred)
+
+        self.mse = mean_squared_error(self.y_true, self.y_pred)
+        self.mae = mean_absolute_error(self.y_true, self.y_pred)
+        self.mape = mean_absolute_percentage_error(self.y_true, self.y_pred)
+        self.r_squared = r2_score(self.y_true, self.y_pred)
+
+    def _to_dict(self) -> dict[str, float]:
+        return {
+            "MSE": self.mse,
+            "MAE": self.mae,
+            "MAPE": self.mape,
+            "R^2": self.r_squared,
+        }
+
+
 @dataclass
 class MetricsComparison:
     metrics: Sequence[ClassificationMetrics]
-    labels: Sequence[str] | None = None
+    model_names: Sequence[str] | None = None
 
     def __post_init__(self):
-        if self.labels is not None and len(self.metrics) != len(self.labels):
+        if self.model_names is not None and len(self.metrics) != len(self.model_names):
             raise ValueError("Lengths of `metrics` and `labels` must be identical.")
 
     def to_df(self) -> pd.DataFrame:
         return pd.concat([metric.to_df() for metric in self.metrics], axis=1).set_axis(
-            self.labels, axis=1
+            self.model_names, axis=1
         )
 
     def _setup_plot(self) -> pd.DataFrame:
