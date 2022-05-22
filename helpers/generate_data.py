@@ -19,23 +19,28 @@ def concat_targets_features(
 
 
 def main():
-    config = ConfigParser(interpolation=ExtendedInterpolation())
-    config.read("config.ini")
+    config_private = ConfigParser(interpolation=ExtendedInterpolation())
+    config_private.read("config_private.ini")
 
-    data_dir = config.get("Paths", "data_dir")
-    data_classification_path = Path(data_dir) / config.get(
+    data_dir = config_private.get("Paths", "data_dir")
+    data_classification_path = Path(data_dir) / config_private.get(
         "Paths", "filename_classification"
     )
-    data_regression_path = Path(data_dir) / config.get("Paths", "filename_regression")
+    data_regression_path = Path(data_dir) / config_private.get(
+        "Paths", "filename_regression"
+    )
 
-    num_samples = config.getint("Constants", "num_samples")
-    num_features = config.getint("Constants", "num_features")
-    num_classification_targets = config.getint(
+    config_public = ConfigParser(interpolation=ExtendedInterpolation())
+    config_public.read("config_public.ini")
+
+    num_samples = config_public.getint("Constants", "num_samples")
+    num_features = config_public.getint("Constants", "num_features")
+    num_classification_targets = config_public.getint(
         "Constants", "num_classification_targets"
     )
-    seed = config.getint("Constants", "seed")
+    seed = config_public.getint("Constants", "seed")
 
-    target_col = config.get("Names", "target_col")
+    target_col = config_public.get("Names", "target_col")
     X_labels = [f"x_{i}" for i in range(1, num_features + 1)]
 
     X_classification, y_classification = make_classification(

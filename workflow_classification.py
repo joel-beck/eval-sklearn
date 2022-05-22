@@ -23,15 +23,20 @@ from helpers.helpers_preprocessing import (
 
 #%%
 # SECTION: Configuration Parameters
-config = ConfigParser(interpolation=ExtendedInterpolation())
-config.read("config.ini")
+config_private = ConfigParser(interpolation=ExtendedInterpolation())
+config_private.read("config_private.ini")
 
-data_dir = config.get("Paths", "data_dir")
-data_classification_path = Path(data_dir) / config.get(
+data_dir = config_private.get("Paths", "data_dir")
+data_classification_path = Path(data_dir) / config_private.get(
     "Paths", "filename_classification"
 )
-seed = config.getint("Constants", "seed")
-target_col = config.get("Names", "target_col")
+
+config_public = ConfigParser(interpolation=ExtendedInterpolation())
+config_public.read("config_public.ini")
+
+seed = config_public.getint("Constants", "seed")
+target_col = config_public.get("Names", "target_col")
+
 
 #%%
 # SECTION: Setup Data
