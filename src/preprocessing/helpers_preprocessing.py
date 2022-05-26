@@ -1,9 +1,7 @@
-from typing import Any
-
 import seaborn as sns
 from sklearn.compose import ColumnTransformer, make_column_selector
 from sklearn.decomposition import PCA
-from sklearn.feature_selection import SelectFromModel, SelectKBest
+from sklearn.feature_selection import SelectKBest
 from sklearn.pipeline import Pipeline
 from sklearn.preprocessing import OneHotEncoder, StandardScaler
 

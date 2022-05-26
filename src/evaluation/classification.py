@@ -10,36 +10,14 @@ from sklearn.metrics import (
     accuracy_score,
     confusion_matrix,
     f1_score,
-    mean_absolute_error,
-    mean_absolute_percentage_error,
-    mean_squared_error,
     precision_score,
-    r2_score,
     recall_score,
     roc_auc_score,
 )
 
+from .base import BaseMetrics
+
 sns.set_theme(style="whitegrid")
-
-
-@dataclass
-class BaseMetrics:
-    y_true: np.ndarray
-    y_pred: np.ndarray | None = None
-    class_pred: np.ndarray | None = None
-    prob_pred: np.ndarray | None = None
-
-    def _to_dict(self) -> None:
-        return NotImplementedError
-
-    def to_dict(self) -> dict[str, float]:
-        return self._to_dict()
-
-    def to_df(self) -> pd.Series:
-        return pd.Series(self.to_dict())
-
-    def __repr__(self) -> str:
-        return "\n".join(f"{key}: {value:.2f}" for key, value in self.to_dict().items())
 
 
 class ClassificationMetrics(BaseMetrics):
@@ -78,24 +56,6 @@ class ClassificationMetrics(BaseMetrics):
     def plot_confusion_matrix(self):
         ConfusionMatrixDisplay.from_predictions(self.y_true, self.class_pred)
         plt.show()
-
-
-class RegressionMetrics(BaseMetrics):
-    def __init__(self, y_true: np.ndarray, y_pred: np.ndarray):
-        super().__init__(y_true=y_true, y_pred=y_pred)
-
-        self.mse = mean_squared_error(self.y_true, self.y_pred)
-        self.mae = mean_absolute_error(self.y_true, self.y_pred)
-        self.mape = mean_absolute_percentage_error(self.y_true, self.y_pred)
-        self.r_squared = r2_score(self.y_true, self.y_pred)
-
-    def _to_dict(self) -> dict[str, float]:
-        return {
-            "MSE": self.mse,
-            "MAE": self.mae,
-            "MAPE": self.mape,
-            "R^2": self.r_squared,
-        }
 
 
 @dataclass
