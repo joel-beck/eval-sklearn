@@ -21,8 +21,8 @@ class BaseMetrics:
     class_pred: np.ndarray | None = None
     prob_pred: np.ndarray | None = None
 
-    def _to_dict(self) -> None:
-        return NotImplementedError
+    def _to_dict(self) -> dict[str, float]:
+        pass
 
     def to_dict(self) -> dict[str, float]:
         return self._to_dict()

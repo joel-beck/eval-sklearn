@@ -2,7 +2,7 @@ from collections.abc import Sequence
 from dataclasses import dataclass, field
 from typing import Any
 
-from sklearn.experimental import enable_halving_search_cv
+from sklearn.experimental import enable_halving_search_cv  # noqa: F401
 from sklearn.model_selection import HalvingRandomSearchCV
 from sklearn.pipeline import Pipeline
 
@@ -48,6 +48,7 @@ def cv_tuning(
     )
 
 
-# TODO: Implement cv_simple() cross validation without hyperparameter tuning with cross_val_score() or cross_validate()
+# TODO: Implement cv_simple() cross validation without hyperparameter tuning with
+# cross_val_score() or cross_validate()
 def cv_simple():
     pass

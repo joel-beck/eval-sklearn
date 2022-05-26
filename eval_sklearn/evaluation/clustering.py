@@ -31,12 +31,12 @@ class EvalKMeans(EvalClustering):
 
     def cross_validate(
         self,
-        k_range: list[int] | tuple[int, int],
+        k_bounds: list[int] | tuple[int, int],
         with_plots: bool = True,
         fig_path: str | None = None,
     ) -> list[float]:
         ssr_list = []
-        k_range = self._k_range_to_sequence(k_range)
+        k_range = self._k_range_to_sequence(k_bounds)
         self._k_range = k_range
 
         if with_plots:
@@ -67,7 +67,7 @@ class EvalKMeans(EvalClustering):
     def plot_elbow(
         self,
         ax: Any | None = None,
-        k_range: list[int] | tuple[int, int] | None = None,
+        k_bounds: list[int] | tuple[int, int] | None = None,
         ssr_list: list[float] | None = None,
     ) -> None:
         """Elbow Plot for KMeans Algorithm to determine best number of clusters."""
@@ -78,16 +78,16 @@ class EvalKMeans(EvalClustering):
         if ax is None:
             fig, ax = plt.subplots()
 
-        if k_range is None:
+        if k_bounds is None:
             k_range = self._k_range
         else:
-            k_range = self._k_range_to_sequence(k_range)
+            k_range = self._k_range_to_sequence(k_bounds)
 
         # avoid refitting when cross_validate_k() was already used
         if ssr_list is None:
             ssr_list = self._ssr_list
         else:
-            ssr_list = self.cross_validate(k_range)
+            ssr_list = self.cross_validate(k_bounds, with_plots=False)  # type: ignore
 
         ax.plot(k_range, ssr_list, marker=".")
         ax.set_xticks(k_range)
@@ -122,7 +122,9 @@ class EvalAgglomerative(EvalClustering):
     # https://scikit-learn.org/stable/auto_examples/cluster/plot_agglomerative_dendrogram.html
     @staticmethod
     def _plot_dendrogram(model: AgglomerativeClustering, ax: Any | None = None) -> None:
-        """Dendogram for Agglomerative Clustering to determine best number of clusters."""
+        """
+        Dendogram for Agglomerative Clustering to determine best number of clusters.
+        """
 
         if not isinstance(model, AgglomerativeClustering):
             raise ValueError(
@@ -159,10 +161,10 @@ class EvalAgglomerative(EvalClustering):
 
     def _cross_validate_clusters(
         self,
-        k_range: list[int] | tuple[int, int] = (2, 5),
+        k_bounds: list[int] | tuple[int, int] = (2, 5),
         linkages: Sequence[str] = ("ward", "complete", "average", "single"),
     ):
-        k_range = self._k_range_to_sequence(k_range)
+        k_range = self._k_range_to_sequence(k_bounds)
         nrows = len(k_range)
         ncols = len(linkages)
         fig, axes = plt.subplots(

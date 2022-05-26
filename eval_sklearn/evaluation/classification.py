@@ -90,7 +90,7 @@ class MetricsComparison:
 
         return plot_df
 
-    def _set_aesthetics(self, g: sns.FacetGrid, lower_bound: int | None) -> None:
+    def _set_aesthetics(self, g: sns.FacetGrid, lower_bound: float | None) -> None:
         g.set_titles(col_template="{col_name}").set_axis_labels(x_var="", y_var="").set(
             xlim=(lower_bound, None)
         )
