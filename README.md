@@ -9,18 +9,18 @@ External contributions are, however, very welcome.
 
 ## Installation
 
-After cloning the repository you can install the `eval_sklearn` with the command
+After cloning the repository you can install the `eval_sklearn` package with the command
 
 ```
 pip install -e .[dev]
 ```
 
-*Note*:
+**Note**:
 Running the practical examples in the `notebooks` folder requires the `lightgbm` package whose installation via `pip` is unreliable at the time of writing.
 Thus, I recommend installing this package via `conda` with the command
 
 ```
-conda install -c conda-forge lightgbm==3.3
+conda install -c conda-forge lightgbm=3.3
 ```
 
 If you do not want to use conda and installation with `pip` fails, the [official installation guide](https://github.com/microsoft/LightGBM/tree/master/python-package) provides help for all operating systems.
@@ -28,7 +28,7 @@ Alternatively, you can simple skip this step since the `lightgbm` dependency is 
 
 ## Resources
 
-Apart from [Stackoverflow](https://stackoverflow.com/questions/tagged/scikit-learn) rabbit holes and various blog posts this project is mainly build upon the two excellent textbooks (with accompanying video lectures)
+Apart from Stackoverflow rabbit holes and various blog posts this project is mainly build upon the two excellent textbooks (with accompanying video lectures)
 
 - Sebastian Raschka et al.: Machine Learning with PyTorch and Scikit-Learn (2022)
     - [Youtube Lectures from 2020](https://www.youtube.com/playlist?list=PLTKMiZHVd_2KyGirGEvKlniaWeLOHhUF3)
