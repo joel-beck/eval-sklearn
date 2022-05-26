@@ -1,9 +1,9 @@
 __pycache__
+.coverage
 .DS_Store
 .ipynb_checkpoints
 .pytest_cache
 .vscode
 config_private.ini
-my_package.egg-info
 eval_sklearn.egg-info
-.coverage
+my_package.egg-info
