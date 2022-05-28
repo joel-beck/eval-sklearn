@@ -6,4 +6,3 @@ __pycache__
 .vscode
 config_private.ini
 eval_sklearn.egg-info
-my_package.egg-info
