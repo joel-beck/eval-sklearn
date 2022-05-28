@@ -74,7 +74,6 @@ class EvalClustering:
             fig, ax = plt.subplots()
 
         svd = TruncatedSVD(2).fit(X)
-
         projections = svd.transform(X)
         ax.scatter(projections[:, 0], projections[:, 1], c=model.labels_)
 
