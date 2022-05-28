@@ -1,5 +1,8 @@
 # Evaluating Scikit-Learn Models
 
+![Tests](https://github.com/joel-beck/eval_sklearn/actions/workflows/tests.yaml/badge.svg)
+![Pre-Commit](https://github.com/joel-beck/eval_sklearn/actions/workflows/pre-commit.yaml/badge.svg)
+
 This repository follows along my learning path of the popular Python library `Scikit-Learn`.
 Throughout this project I aim to conform to best practices of the `Scikit-Learn` community in the year 2022 and provide convenience functions for evaluating classification, regression and clustering models.
 
