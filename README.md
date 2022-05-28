@@ -12,14 +12,28 @@ External contributions are, however, very welcome.
 
 ## Installation
 
-After cloning the repository you can install the `eval_sklearn` package with the command
+In order to use the `eval_sklearn` package you can clone the repository from GitHub and install all required dependencies with
+
+```
+pip install .
+```
+
+If you want to contribute to development please run the command
 
 ```
 pip install -e .[dev]
 ```
 
+to install the `eval_sklearn` package in *editable mode* with all development dependencies.
+
+Finally, in order to run the practical examples in the `notebooks` folder, you can install the full set of dependencies with
+
+```
+pip install -e .[dev, notebooks]
+```
+
 **Note**:
-Running the practical examples in the `notebooks` folder requires the `lightgbm` package whose installation via `pip` is unreliable at the time of writing.
+Running the notebooks additionally requires the `lightgbm` package whose installation via `pip` is unreliable at the time of writing.
 Thus, I recommend installing this package via `conda` with the command
 
 ```
@@ -27,7 +41,7 @@ conda install -c conda-forge lightgbm=3.3
 ```
 
 If you do not want to use conda and installation with `pip` fails, the [official installation guide](https://github.com/microsoft/LightGBM/tree/master/python-package) provides help for all operating systems.
-Alternatively, you can simple skip this step since the `lightgbm` dependency is **not** required for the core functionality of the `eval_sklearn` package.
+
 
 ## Resources
 
