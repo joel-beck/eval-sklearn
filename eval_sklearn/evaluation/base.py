@@ -1,3 +1,4 @@
+from abc import ABC, abstractmethod
 from collections.abc import Sequence
 from dataclasses import dataclass, field
 from typing import Any
@@ -14,18 +15,16 @@ from sklearn.utils.validation import check_is_fitted
 sns.set_theme(style="whitegrid")
 
 
-@dataclass
-class BaseMetrics:
+@dataclass  # type: ignore[misc]
+class BaseMetrics(ABC):
     y_true: np.ndarray
     y_pred: np.ndarray | None = None
     class_pred: np.ndarray | None = None
     prob_pred: np.ndarray | None = None
 
-    def _to_dict(self) -> dict[str, float]:
-        pass
-
+    @abstractmethod
     def to_dict(self) -> dict[str, float]:
-        return self._to_dict()
+        """Dictionary representation containing metric labels and values."""
 
     def to_df(self) -> pd.Series:
         return pd.Series(self.to_dict())
@@ -34,8 +33,8 @@ class BaseMetrics:
         return "\n".join(f"{key}: {value:.2f}" for key, value in self.to_dict().items())
 
 
-@dataclass
-class EvalClustering:
+@dataclass  # type: ignore[misc]
+class EvalClustering(ABC):
     model: KMeans | AgglomerativeClustering
     X: np.ndarray = field(repr=False)
 
@@ -109,3 +108,7 @@ class EvalClustering:
             nrows = n_subplots // 3
             ncols = 3
         return nrows, ncols
+
+    @abstractmethod
+    def plot_clusters(self) -> None:
+        """Two-dimensional display of data points colored by cluster labels."""

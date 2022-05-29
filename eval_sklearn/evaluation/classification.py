@@ -40,7 +40,7 @@ class ClassificationMetrics(BaseMetrics):
             else roc_auc_score(self.y_true, self.class_pred)
         )
 
-    def _to_dict(self) -> dict[str, float]:
+    def to_dict(self) -> dict[str, float]:
         return {
             "Accuracy": self.accuracy,
             "Precision": self.precision,

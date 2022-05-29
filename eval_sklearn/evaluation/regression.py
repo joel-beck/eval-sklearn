@@ -21,7 +21,7 @@ class RegressionMetrics(BaseMetrics):
         self.mape = mean_absolute_percentage_error(self.y_true, self.y_pred)
         self.r_squared = r2_score(self.y_true, self.y_pred)
 
-    def _to_dict(self) -> dict[str, float]:
+    def to_dict(self) -> dict[str, float]:
         return {
             "MSE": self.mse,
             "MAE": self.mae,

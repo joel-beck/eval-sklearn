@@ -87,7 +87,9 @@ class EvalKMeans(EvalClustering):
         if ssr_list is None:
             ssr_list = self._ssr_list
         else:
-            ssr_list = self.cross_validate(k_bounds, with_plots=False)  # type: ignore
+            # signaling mypy that k_bounds argument of cross_validate() is not None
+            assert k_bounds is not None
+            ssr_list = self.cross_validate(k_bounds, with_plots=False)
 
         ax.plot(k_range, ssr_list, marker=".")
         ax.set_xticks(k_range)
