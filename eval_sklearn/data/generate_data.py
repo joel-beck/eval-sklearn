@@ -1,9 +1,12 @@
-from configparser import ConfigParser, ExtendedInterpolation
+import os
 from pathlib import Path
 
 import numpy as np
 import pandas as pd
+from dotenv import load_dotenv
 from sklearn.datasets import make_blobs, make_classification, make_regression
+
+from config import PublicConfig
 
 
 def concat_targets_features(
@@ -19,34 +22,24 @@ def concat_targets_features(
 
 
 def main(testing: bool = False) -> None:
-    mode = "testing" if testing else "notebooks"
+    load_dotenv()
+    PROJECT_PATH = os.environ.get("PROJECT_PATH")
+    assert PROJECT_PATH is not None
+    data_dir = Path(PROJECT_PATH) / "data"
 
-    config_private = ConfigParser(interpolation=ExtendedInterpolation())
-    config_private.read("../../config_private.ini")
+    file_ending = "testing.pkl" if testing else "notebooks.pkl"
+    data_classification_path = Path(data_dir) / ("data_classification_" + file_ending)
+    data_regression_path = Path(data_dir) / ("data_regression_" + file_ending)
+    data_clustering_path = Path(data_dir) / ("data_clustering_" + file_ending)
 
-    data_dir = config_private.get("Paths", "data_dir")
-    data_classification_path = Path(data_dir) / config_private.get(
-        "Paths", "filename_classification_" + mode
-    )
-    data_regression_path = Path(data_dir) / config_private.get(
-        "Paths", "filename_regression_" + mode
-    )
-    data_clustering_path = Path(data_dir) / config_private.get(
-        "Paths", "filename_clustering_" + mode
-    )
+    conf = PublicConfig()
+    num_samples = conf.NUM_SAMPLES_TESTING if testing else conf.NUM_SAMPLES_NOTEBOOKS
+    num_features = conf.NUM_FEATURES
+    num_classification_targets = conf.NUM_TARGETS
+    num_clusters = conf.NUM_CLUSTERS
+    seed = conf.SEED
+    target_col = conf.TARGET_COL
 
-    config_public = ConfigParser(interpolation=ExtendedInterpolation())
-    config_public.read("../../config_public.ini")
-
-    num_samples = config_public.getint("Constants", "num_samples_" + mode)
-    num_features = config_public.getint("Constants", "num_features")
-    num_classification_targets = config_public.getint(
-        "Constants", "num_classification_targets"
-    )
-    num_clusters = config_public.getint("Constants", "num_clusters")
-    seed = config_public.getint("Constants", "seed")
-
-    target_col = config_public.get("Names", "target_col")
     X_labels = [f"x_{i}" for i in range(1, num_features + 1)]
 
     X_classification, y_classification = make_classification(

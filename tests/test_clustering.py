@@ -1,23 +1,26 @@
-from configparser import ConfigParser, ExtendedInterpolation
+import os
 from pathlib import Path
 
 import numpy as np
 import pandas as pd
+from dotenv import load_dotenv
 from sklearn.cluster import AgglomerativeClustering, KMeans
 
+from config import PublicConfig
 from eval_sklearn.evaluation import EvalAgglomerative, EvalKMeans
 
 # required to run pytest from package root directory, relative paths then refer to root
 # directory rather than directory of test file
-package_path = Path.cwd()
+load_dotenv()
+PROJECT_PATH = os.environ.get("PROJECT_PATH")
 
-data: pd.DataFrame = pd.read_pickle(package_path / "data/data_clustering_testing.pkl")
+conf = PublicConfig()
+seed = conf.SEED
+target_col = conf.TARGET_COL
 
-config_public = ConfigParser(interpolation=ExtendedInterpolation())
-config_public.read(package_path / "config_public.ini")
-seed = config_public.getint("Constants", "seed")
-target_col = config_public.get("Names", "target_col")
-
+data: pd.DataFrame = pd.read_pickle(
+    Path(PROJECT_PATH) / "data/data_clustering_testing.pkl"
+)
 X = data.drop(columns=target_col)
 
 kmeans = KMeans(n_clusters=3, random_state=seed)
