@@ -1,9 +1,7 @@
-import os
 from pathlib import Path
 
 import numpy as np
 import pandas as pd
-from dotenv import load_dotenv
 from sklearn.cluster import AgglomerativeClustering, KMeans
 
 from config import PublicConfig
@@ -11,15 +9,15 @@ from eval_sklearn.evaluation import EvalAgglomerative, EvalKMeans
 
 # required to run pytest from package root directory, relative paths then refer to root
 # directory rather than directory of test file
-load_dotenv()
-PROJECT_PATH = os.environ.get("PROJECT_PATH")
+# dotenv package FAILS in CI pipeline without mocking
+project_path = Path.cwd()
 
 conf = PublicConfig()
 seed = conf.SEED
 target_col = conf.TARGET_COL
 
 data: pd.DataFrame = pd.read_pickle(
-    Path(PROJECT_PATH) / "data/data_clustering_testing.pkl"
+    Path(project_path) / "data/data_clustering_testing.pkl"
 )
 X = data.drop(columns=target_col)
 
