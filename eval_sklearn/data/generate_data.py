@@ -1,9 +1,7 @@
-import os
 from pathlib import Path
 
 import numpy as np
 import pandas as pd
-from dotenv import load_dotenv
 from sklearn.datasets import make_blobs, make_classification, make_regression
 
 from config import PublicConfig
@@ -22,12 +20,9 @@ def concat_targets_features(
 
 
 def main(testing: bool = False) -> None:
-    load_dotenv()
-    PROJECT_PATH = os.environ.get("PROJECT_PATH")
-    assert PROJECT_PATH is not None
-    data_dir = Path(PROJECT_PATH) / "data"
-
+    data_dir = "../../data"
     file_ending = "testing.pkl" if testing else "notebooks.pkl"
+
     data_classification_path = Path(data_dir) / ("data_classification_" + file_ending)
     data_regression_path = Path(data_dir) / ("data_regression_" + file_ending)
     data_clustering_path = Path(data_dir) / ("data_clustering_" + file_ending)
