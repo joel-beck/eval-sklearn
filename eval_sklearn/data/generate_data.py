@@ -20,12 +20,12 @@ def concat_targets_features(
 
 
 def main(testing: bool = False) -> None:
-    data_dir = "../../data"
+    data_dir = Path("../../data")
     file_ending = "testing.pkl" if testing else "notebooks.pkl"
 
-    data_classification_path = Path(data_dir) / ("data_classification_" + file_ending)
-    data_regression_path = Path(data_dir) / ("data_regression_" + file_ending)
-    data_clustering_path = Path(data_dir) / ("data_clustering_" + file_ending)
+    data_classification_path = data_dir / ("data_classification_" + file_ending)
+    data_regression_path = data_dir / ("data_regression_" + file_ending)
+    data_clustering_path = data_dir / ("data_clustering_" + file_ending)
 
     conf = PublicConfig()
     num_samples = conf.NUM_SAMPLES_TESTING if testing else conf.NUM_SAMPLES_NOTEBOOKS
