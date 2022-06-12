@@ -1,13 +1,16 @@
-default_stages: [commit, push]
 repos:
   - repo: https://github.com/pre-commit/pre-commit-hooks
     rev: v4.1.0
     hooks:
       - id: check-added-large-files
         args: ['--maxkb=10000']
+        stages: [commit]
       - id: check-yaml
+        stages: [commit]
       - id: end-of-file-fixer
+        stages: [commit]
       - id: trailing-whitespace
+        stages: [commit]
   - repo: https://github.com/asottile/pyupgrade
     rev: v2.31.1
     hooks:
@@ -18,10 +21,12 @@ repos:
     rev: 5.10.1
     hooks:
       - id: isort
+        stages: [commit]
   - repo: https://github.com/psf/black
     rev: 22.3.0
     hooks:
       - id: black
+        stages: [commit]
   - repo: https://github.com/pycqa/flake8
     rev: 4.0.1
     hooks:
