@@ -22,6 +22,8 @@ repos:
       - id: end-of-file-fixer
         stages: [commit]
       - id: file-contents-sorter
+        files: .gitignore
+        args: [--ignore-case]
         stages: [commit]
       - id: name-tests-test
         stages: [commit]
