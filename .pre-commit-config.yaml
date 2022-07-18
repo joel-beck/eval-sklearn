@@ -26,7 +26,8 @@ repos:
         files: .gitignore
         stages: [commit]
       - id: name-tests-test
-        args: [--pytest-test-first]
+        # test files start with test_ instead of ending with _test
+        args: [-h]
         stages: [commit]
       - id: pretty-format-json
         stages: [commit]
