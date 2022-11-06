@@ -2,13 +2,16 @@
 requires = ["setuptools>=60.0", "wheel"]
 build-backend = "setuptools.build_meta"
 
+# make isort compatible with black
+# https://black.readthedocs.io/en/stable/guides/using_black_with_other_tools.html#isort
 [tool.isort]
 profile = "black"
 
 [tool.pytest.ini_options]
-filterwarnings = ["ignore::DeprecationWarning", "ignore::UserWarning"]
-addopts = "--cov=eval_sklearn"
 testpaths = ["tests"]
+# command line options for pytest
+addopts = "--verbose --cov=eval_sklearn"
+filterwarnings = ["ignore::DeprecationWarning", "ignore::UserWarning"]
 
 [tool.mypy]
 mypy_path = "eval_sklearn"
